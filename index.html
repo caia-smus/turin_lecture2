@@ -51,6 +51,24 @@
             color: #1e3a8a;
             font-size: 18px;
             filter: drop-shadow(0 0 8px rgba(255,255,255,1));
+            pointer-events: none;
+        }
+        .label-community {
+            color: #1e3a8a;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: none;
+            text-align: center;
+            line-height: 1.1;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,1));
+            pointer-events: none;
+        }
+        .community-marker {
+            background: #ef4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
         }
         .label-neighbor {
             color: #64748b;
@@ -80,13 +98,22 @@
         dragging: true
     }).setView([13.85, -88.9], 9);
 
-    // Vibrant "Pop" Styles
+    // Styles
     const focusStyle = {
         fillColor: "#4f46e5", // Bold Indigo
         color: "#312e81",     // Dark Indigo border
         weight: 3,
         opacity: 1,
-        fillOpacity: 0.25
+        fillOpacity: 0.15
+    };
+
+    const communityStyle = {
+        fillColor: "#ffffff",
+        color: "#1e3a8a",
+        weight: 1.5,
+        dashArray: '3',
+        opacity: 0.8,
+        fillOpacity: 0.4
     };
 
     const backgroundStyle = {
@@ -101,15 +128,20 @@
         const labelIcon = L.divIcon({
             className: `country-label ${extraClass}`,
             html: text,
-            iconSize: [140, 20]
+            iconSize: [160, 40]
         });
         L.marker(latlng, { icon: labelIcon, interactive: false }).addTo(map);
     }
 
     async function loadMap() {
         try {
-            const response = await fetch('central_america.geojson');
-            const data = await response.json();
+            const [caRes, sfeRes] = await Promise.all([
+                fetch('central_america.geojson'),
+                fetch('sfe_community.geojson')
+            ]);
+            
+            const data = await caRes.json();
+            const sfeData = await sfeRes.json();
 
             // Filter the unified data for our target countries
             const esFeature = data.features.find(f => f.properties['ISO3166-1-Alpha-3'] === 'SLV');
@@ -120,15 +152,26 @@
             if (hndFeature) L.geoJSON(hndFeature, { style: backgroundStyle }).addTo(map);
             if (esFeature) L.geoJSON(esFeature, { style: focusStyle }).addTo(map);
 
-            // Guatemala: Centrally placed and moved slightly away from the line
-            // to ensure no overlap with the Salvadoran border.
-            addLabel([14.22, -90.0], 'Guatemala', 'label-neighbor');
-            
-            // Honduras: Maintained Westward position
+            // Add the Community Border
+            L.geoJSON(sfeData, { style: communityStyle }).addTo(map);
+
+            // Add the Community Marker (Dot)
+            const sfeCoords = [13.8833, -88.9500];
+            L.marker(sfeCoords, {
+                icon: L.divIcon({
+                    className: 'community-marker',
+                    iconSize: [8, 8]
+                }),
+                interactive: false
+            }).addTo(map);
+
+            // Add Labels
+            addLabel([14.35, -90.6], 'Guatemala', 'label-neighbor');
             addLabel([14.3, -88.5], 'Honduras', 'label-neighbor');
+            addLabel([13.6, -88.9], 'El Salvador', 'label-es'); // Moved slightly south to avoid community
             
-            // El Salvador: More prominent label
-            addLabel([13.78, -88.9], 'El Salvador', 'label-es');
+            // Community label exactly where the marker is
+            addLabel([13.88, -88.95], 'San Francisco<br>Echeverría', 'label-community');
 
         } catch (error) {
             console.error('Error rendering map:', error);
