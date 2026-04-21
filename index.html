@@ -120,9 +120,9 @@
             if (hndFeature) L.geoJSON(hndFeature, { style: backgroundStyle }).addTo(map);
             if (esFeature) L.geoJSON(esFeature, { style: focusStyle }).addTo(map);
 
-            // Guatemala: Transversal move (Up and slightly West)
-            // Positioned centrally between the coast and the Honduran border
-            addLabel([14.35, -90.6], 'Guatemala', 'label-neighbor');
+            // Guatemala: Near the border, centrally placed along the diagonal 
+            // between the coast and the tripoint
+            addLabel([14.15, -89.8], 'Guatemala', 'label-neighbor');
             
             // Honduras: Maintained Westward position
             addLabel([14.3, -88.5], 'Honduras', 'label-neighbor');
