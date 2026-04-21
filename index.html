@@ -6,51 +6,61 @@
     <title>El Salvador Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; background: #eef2f5; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
+
+        body { margin: 0; padding: 0; background: #0a0a0c; overflow: hidden; }
         #map { 
             height: 100vh; 
             width: 100vw; 
-            background: #eef2f5; /* Modern soft blue-gray background */
+            background: #0a0a0c;
         }
         .map-header {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 24px;
+            left: 24px;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.3);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 24px;
+            border-radius: 100px;
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Space Grotesk', sans-serif;
         }
         .map-header h1 {
             margin: 0;
-            font-size: 1.5rem;
-            color: #1a202c;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-        }
-        .country-label {
-            color: #4a5568;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 1.2rem;
+            color: #00ffff;
             text-transform: uppercase;
             letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .country-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
             white-space: nowrap;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Subtle glass-morphism for labels */
-            text-shadow: 0 0 4px rgba(255,255,255,0.8);
+            pointer-events: none;
         }
         .label-es {
-            color: #2b6cb0;
-            font-size: 16px;
+            color: #ff00ff;
+            font-size: 20px;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
         }
-        /* Hide Leaflet attribution for a cleaner "app" look */
+        .label-neighbor {
+            color: #ffffff;
+            font-size: 11px;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 50px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
         .leaflet-control-attribution {
             display: none !important;
         }
@@ -59,40 +69,37 @@
 <body>
 
 <div class="map-header">
-    <h1>El Salvador</h1>
+    <h1>El Salvador . 🇸🇻</h1>
 </div>
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Initialize the map with fixed zoom and disabled interaction for a "fixed" look
     const map = L.map('map', {
         zoomControl: false,
         scrollWheelZoom: false,
         doubleClickZoom: false,
         touchZoom: false,
         boxZoom: false,
-        dragging: true // Allow slight panning for small adjustments
-    }).setView([13.7942, -88.8965], 9);
+        dragging: true
+    }).setView([13.85, -89.0], 9);
 
-    // Modern Color Palette
     const focusStyle = {
-        fillColor: "#3182ce",
-        color: "#2c5282",
-        weight: 2.5,
-        opacity: 0.8,
-        fillOpacity: 0.25
+        fillColor: "#ff00ff",
+        color: "#ff00ff",
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.15
     };
 
     const backgroundStyle = {
-        fillColor: "#cbd5e0",
-        color: "#a0aec0",
-        weight: 1,
-        opacity: 0.4,
-        fillOpacity: 0.1
+        fillColor: "#333",
+        color: "#555",
+        weight: 1.5,
+        opacity: 0.6,
+        fillOpacity: 0.05
     };
 
-    // Function to add labels
     function addLabel(latlng, text, extraClass = '') {
         const labelIcon = L.divIcon({
             className: `country-label ${extraClass}`,
@@ -102,7 +109,6 @@
         L.marker(latlng, { icon: labelIcon, interactive: false }).addTo(map);
     }
 
-    // Load and render GeoJSON layers
     async function loadMap() {
         try {
             const [es, gtm, hnd] = await Promise.all([
@@ -111,17 +117,14 @@
                 fetch('honduras.geojson').then(r => r.json())
             ]);
 
-            // Add neighbors
             L.geoJSON(gtm, { style: backgroundStyle }).addTo(map);
             L.geoJSON(hnd, { style: backgroundStyle }).addTo(map);
-            
-            // Add El Salvador on top
             L.geoJSON(es, { style: focusStyle }).addTo(map);
 
-            // Add clean labels
-            addLabel([14.7, -90.3], 'Guatemala');
-            addLabel([14.8, -87.2], 'Honduras');
-            addLabel([13.79, -88.9], 'El Salvador', 'label-es');
+            // Labels moved much closer to the borders
+            addLabel([14.3, -89.6], 'Guatemala', 'label-neighbor');
+            addLabel([14.1, -88.1], 'Honduras', 'label-neighbor');
+            addLabel([13.75, -88.9], 'El Salvador', 'label-es');
 
         } catch (error) {
             console.error('Error rendering map:', error);
