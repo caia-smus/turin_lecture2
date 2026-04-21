@@ -19,6 +19,18 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             font-family: Arial, sans-serif;
         }
+        .country-label {
+            color: #333;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 0px white, -1px -1px 0px white, 1px -1px 0px white, -1px 1px 0px white;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -30,8 +42,9 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Initialize the map centered on El Salvador
-    const map = L.map('map').setView([13.7942, -88.8965], 8);
+    // Initialize the map with a slightly closer zoom (8.5 if supported, or 9)
+    // We center it slightly more to the west to balance the neighboring country visibility
+    const map = L.map('map').setView([13.7942, -89.0], 8);
 
     // Style for El Salvador (Main focus)
     const focusStyle = {
@@ -39,35 +52,46 @@
         color: "#0044aa",
         weight: 3,
         opacity: 1,
-        fillOpacity: 0.4
+        fillOpacity: 0.3
     };
 
     // Style for neighboring countries (Quiet)
     const backgroundStyle = {
-        fillColor: "#cccccc",
-        color: "#999999",
-        weight: 1,
-        opacity: 0.6,
-        fillOpacity: 0.1
+        fillColor: "#aaaaaa",
+        color: "#777777",
+        weight: 1.5,
+        opacity: 0.5,
+        fillOpacity: 0.05
     };
 
+    // Function to add labels using L.marker with DivIcon
+    function addLabel(latlng, text) {
+        const labelIcon = L.divIcon({
+            className: 'country-label',
+            html: `<b>${text}</b>`,
+            iconSize: [100, 20]
+        });
+        L.marker(latlng, { icon: labelIcon, interactive: false }).addTo(map);
+    }
+
     // Function to load and add GeoJSON to map
-    async function addLayer(url, style) {
+    async function addLayer(url, style, labelText, labelPos) {
         try {
             const response = await fetch(url);
             const data = await response.json();
             L.geoJSON(data, { style: style }).addTo(map);
+            if (labelText && labelPos) {
+                addLabel(labelPos, labelText);
+            }
         } catch (error) {
             console.error('Error loading GeoJSON:', url, error);
         }
     }
 
-    // Load neighbors first (background)
-    addLayer('guatemala.geojson', backgroundStyle);
-    addLayer('honduras.geojson', backgroundStyle);
-
-    // Load El Salvador last (foreground focus)
-    addLayer('el_salvador.geojson', focusStyle);
+    // Load layers with labels
+    addLayer('guatemala.geojson', backgroundStyle, 'GUATEMALA', [14.6, -90.5]);
+    addLayer('honduras.geojson', backgroundStyle, 'HONDURAS', [14.5, -87.5]);
+    addLayer('el_salvador.geojson', focusStyle, 'EL SALVADOR', [13.7, -88.9]);
 
 </script>
 </body>
