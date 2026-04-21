@@ -54,9 +54,9 @@
             pointer-events: none;
         }
         .label-community {
-            color: #1e3a8a;
+            color: #b91c1c; /* Deep red for better contrast */
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: none;
             text-align: center;
@@ -64,11 +64,12 @@
             filter: drop-shadow(0 0 5px rgba(255,255,255,1));
             pointer-events: none;
         }
-        .community-marker {
+        .community-pin {
             background: #ef4444;
             border: 2px solid white;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
         .label-neighbor {
             color: #64748b;
@@ -109,11 +110,10 @@
 
     const communityStyle = {
         fillColor: "#ffffff",
-        color: "#1e3a8a",
-        weight: 1.5,
-        dashArray: '3',
-        opacity: 0.8,
-        fillOpacity: 0.4
+        color: "#b91c1c", // Red border for contrast
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.6
     };
 
     const backgroundStyle = {
@@ -155,23 +155,28 @@
             // Add the Community Border
             L.geoJSON(sfeData, { style: communityStyle }).addTo(map);
 
-            // Add the Community Marker (Dot)
+            // Add the Community Pin Marker
             const sfeCoords = [13.8833, -88.9500];
             L.marker(sfeCoords, {
                 icon: L.divIcon({
-                    className: 'community-marker',
-                    iconSize: [8, 8]
+                    className: 'community-pin',
+                    iconSize: [12, 12],
+                    iconAnchor: [6, 12]
                 }),
                 interactive: false
             }).addTo(map);
 
             // Add Labels
+            // Guatemala: Restored to transversal position as requested before
             addLabel([14.35, -90.6], 'Guatemala', 'label-neighbor');
-            addLabel([14.3, -88.5], 'Honduras', 'label-neighbor');
-            addLabel([13.6, -88.9], 'El Salvador', 'label-es'); // Moved slightly south to avoid community
             
-            // Community label exactly where the marker is
-            addLabel([13.88, -88.95], 'San Francisco<br>Echeverría', 'label-community');
+            addLabel([14.3, -88.5], 'Honduras', 'label-neighbor');
+            
+            // Moved much further South to give the community center stage
+            addLabel([13.4, -88.9], 'El Salvador', 'label-es'); 
+            
+            // Community label with stronger red color and improved position
+            addLabel([13.91, -88.95], 'San Francisco<br>Echeverría', 'label-community');
 
         } catch (error) {
             console.error('Error rendering map:', error);
