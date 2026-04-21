@@ -55,7 +55,7 @@
             pointer-events: none;
         }
         .label-community {
-            color: #b91c1c;
+            color: #ea580c; /* Vibrant Orange */
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 16px; /* Larger for image export */
             font-weight: 800;
@@ -66,7 +66,7 @@
             pointer-events: none;
         }
         .community-pin {
-            background: #ef4444;
+            background: #f97316; /* Vibrant Orange */
             border: 2px solid white;
             border-radius: 50% 50% 50% 0;
             transform: rotate(-45deg);
@@ -112,7 +112,7 @@
 
     const communityStyle = {
         fillColor: "#ffffff",
-        color: "#b91c1c", // Red border for contrast
+        color: "#ea580c", // Vibrant Orange border
         weight: 2,
         opacity: 1,
         fillOpacity: 0.6
@@ -175,8 +175,8 @@
             // Honduras: Moved closer to border
             addLabel([14.2, -88.4], 'Honduras', 'label-neighbor');
             
-            // El Salvador: Moved up to be more central but clear of community
-            addLabel([13.55, -88.9], 'El Salvador', 'label-es'); 
+            // El Salvador: Moved slightly higher for a more central feel
+            addLabel([13.65, -88.9], 'El Salvador', 'label-es'); 
             
             // Community label
             addLabel([13.98, -88.95], 'San Francisco<br>Echeverría', 'label-community');
